@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Each trainer uploads into their own folder: pokemon/{uid}/{file}
+    match /pokemon/{uid}/{fileName} {
+      // Signed-in users can read artwork (the card only needs the download URL).
+      allow read: if request.auth != null;
+
+      // A trainer may only write files into their own folder, and only images
+      // up to 5 MB. This mirrors the client-side validation in the form.
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      // Replacing/removing artwork (and deleting a Pokémon record) cleans up
+      // the old file.
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      allow delete: if request.auth != null
+        && request.auth.uid == uid;
+    }
+  }
+}

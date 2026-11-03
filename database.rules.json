@@ -1,0 +1,15 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "pokemon": {
+      ".indexOn": ["createdBy"],
+      ".read": "auth != null && query.orderByChild == 'createdBy' && query.equalTo == auth.uid",
+      "$pokemonId": {
+        ".read": "auth != null && (!data.exists() || data.child('createdBy').val() === auth.uid)",
+        ".write": "auth != null && ((!data.exists() && newData.child('createdBy').val() === auth.uid) || (data.exists() && data.child('createdBy').val() === auth.uid && (!newData.exists() || newData.child('createdBy').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['id','name','type','description','level','hp','attack','defense','imageUrl','createdBy','createdAt','updatedAt']) && newData.child('id').val() === $pokemonId && newData.child('name').isString() && newData.child('name').val().length >= 2 && newData.child('name').val().length <= 40 && newData.child('type').isString() && newData.child('type').val().matches(/^(Normal|Fire|Water|Grass|Electric|Ice|Fighting|Poison|Ground|Flying|Psychic|Bug|Rock|Ghost|Dragon|Dark|Steel|Fairy)$/) && newData.child('description').isString() && newData.child('description').val().length >= 10 && newData.child('description').val().length <= 500 && newData.child('level').isNumber() && newData.child('level').val() >= 1 && newData.child('level').val() <= 100 && newData.child('hp').isNumber() && newData.child('hp').val() >= 1 && newData.child('hp').val() <= 999 && newData.child('attack').isNumber() && newData.child('attack').val() >= 1 && newData.child('attack').val() <= 999 && newData.child('defense').isNumber() && newData.child('defense').val() >= 1 && newData.child('defense').val() <= 999 && newData.child('imageUrl').isString() && newData.child('imageUrl').val().length <= 500 && newData.child('createdBy').val() === auth.uid && newData.child('createdAt').isNumber() && newData.child('updatedAt').isNumber()"
+      }
+    }
+  }
+}
